@@ -1,0 +1,11 @@
+<h1>testing dude</h1>
+
+
+<% events.forEach( function( event ) { %>
+
+    <h2><%= event.name.text %></h2>
+    <h4><a href="<%= event.url %>">CLICK HERE FOR MORE INFO</a></h4>
+    <% if( event.logo ){ %> <img src='<%= event.logo.url%>'><% } %>
+    <div><input type="submit" value="ADD THIS EVENT TO MY FAVORITES"></div>
+    <hr />
+<% }); %>
