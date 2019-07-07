@@ -8,6 +8,11 @@ app.set( 'view engine', 'ejs' );
 app.use( ejsLayouts );
 
 
+// For allowing PUT and DELETE requests
+var methodOverride = require( 'method-override' );
+app.use(methodOverride( '_method' ) );
+
+
 // Module allows the use of sessions
 const session = require( 'express-session' );
 
@@ -25,10 +30,8 @@ const helmet     = require( 'helmet' );
 // This is only used by the session store
 const db = require( './models' );
 
-
 // this line makes the session use sequelize to write session data to a postgres table
 const SequelizeStore = require( 'connect-session-sequelize' )( session.Store );
-
 
 const sessionStore = new SequelizeStore({
 
@@ -83,20 +86,32 @@ var request = require( 'request' );
 
 app.get( '/', function( req, res ) {
 
+  // console.log( req.user.dataValues.id );
   res.render( 'index' );
 });
 
-app.get( '/fuckshit', function( req, res ) {
-
-  res.render( 'shitty.ejs' );
-});
 
 app.get( '/profile', isLoggedIn, function( req, res ) {
 
-  res.render( 'profile' );
+  db.user.findOne({
+
+    where: { id: req.user.dataValues.id }
+  }).then( function( user ) {
+
+    user.getFavorites({
+
+      order: [
+
+        [ 'id', 'ASC' ]
+      ]
+    }).then( function( favorites ){
+
+      res.render( 'profile', { favorites } );
+    });
+  });
 });
 
-app.use( '/events', require( './controllers/events' ) );
+app.use( '/events', isLoggedIn, require( './controllers/events' ) );
 
 app.use( '/auth', require( './controllers/auth' ) );
 

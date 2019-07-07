@@ -40,7 +40,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   user.associate = function(models) {
-    // associations can be defined here
+
+    models.user.hasMany( models.favorite );
   };
   user.prototype.validPassword = function(passwordTyped) {
     return bcrypt.compareSync(passwordTyped, this.password);
